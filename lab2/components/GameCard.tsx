@@ -1,14 +1,111 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
-import { useTheme } from "../contexts/ThemeContext";
+import styled from "styled-components/native";
 import { Game } from "../data/gamesData";
+
+// Styled components
+const Card = styled.TouchableOpacity<{ featured?: boolean }>`
+  flex-direction: row;
+  margin-vertical: 8px;
+  border-radius: ${(props) => (props.featured ? "8px" : "4px")};
+  overflow: hidden;
+  background-color: ${(props) => props.theme.card};
+  elevation: ${(props) => (props.featured ? 3 : 2)};
+  shadow-color: #000;
+  shadow-offset: 0px 1px;
+  shadow-opacity: 0.2;
+  shadow-radius: 1.5px;
+`;
+
+const FeaturedCard = styled(Card)`
+  margin-vertical: 10px;
+`;
+
+const GameImage = styled.Image`
+  width: 120px;
+  height: 70px;
+`;
+
+const FeaturedImage = styled.Image`
+  width: 100%;
+  height: 180px;
+`;
+
+const Content = styled.View`
+  flex: 1;
+  padding: 10px;
+`;
+
+const FeaturedContent = styled.View`
+  padding: 12px;
+`;
+
+const Title = styled.Text`
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: ${(props) => props.theme.text};
+`;
+
+const RecommendedBy = styled.Text`
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-style: italic;
+  color: ${(props) => props.theme.text};
+`;
+
+const PlatformContainer = styled.View`
+  flex-direction: row;
+  margin-bottom: 4px;
+`;
+
+const PlatformText = styled.Text`
+  color: ${(props) => props.theme.text};
+  margin-right: 5px;
+`;
+
+const PriceContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
+const DiscountBadge = styled.View`
+  padding-horizontal: 6px;
+  padding-vertical: 2px;
+  border-radius: 3px;
+  margin-right: 8px;
+  background-color: #4c6b22;
+`;
+
+const DiscountText = styled.Text`
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+`;
+
+const PricesWrapper = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const OriginalPrice = styled.Text`
+  text-decoration-line: line-through;
+  margin-right: 5px;
+  font-size: 12px;
+  color: ${(props) => props.theme.text};
+`;
+
+const DiscountedPrice = styled.Text`
+  font-size: 16px;
+  font-weight: bold;
+  color: ${(props) => props.theme.text};
+`;
+
+const Price = styled.Text`
+  font-size: 16px;
+  font-weight: bold;
+  color: ${(props) => props.theme.text};
+`;
 
 interface GameCardProps {
   game: Game;
@@ -19,200 +116,76 @@ export const GameCard: React.FC<GameCardProps> = ({
   game,
   featured = false,
 }) => {
-  const { colors } = useTheme();
-
   const renderPlatformIcons = () => {
     return (
-      <View style={styles.platformContainer}>
+      <PlatformContainer>
         {game.platforms.includes("Windows") && (
-          <Text style={{ color: colors.text }}>🖥️ Windows</Text>
+          <PlatformText>🖥️ Windows</PlatformText>
         )}
-        {game.platforms.includes("Mac") && (
-          <Text style={{ color: colors.text }}>🍎 Mac</Text>
-        )}
+        {game.platforms.includes("Mac") && <PlatformText>🍎 Mac</PlatformText>}
         {game.platforms.includes("Linux") && (
-          <Text style={{ color: colors.text }}>🐧 Linux</Text>
+          <PlatformText>🐧 Linux</PlatformText>
         )}
-      </View>
+      </PlatformContainer>
     );
   };
 
   if (featured) {
     return (
-      <TouchableOpacity
-        style={[styles.featuredCard, { backgroundColor: colors.card }]}
-        activeOpacity={0.7}
-      >
-        <Image source={{ uri: game.imageUri }} style={styles.featuredImage} />
-        <View style={styles.featuredContent}>
-          <Text style={[styles.title, { color: colors.text }]}>
-            {game.title}
-          </Text>
-          <Text style={[styles.recommendedBy, { color: colors.text }]}>
-            Recommended by your friend, Player
-          </Text>
-          <View style={styles.priceContainer}>
+      <FeaturedCard activeOpacity={0.7} featured>
+        <FeaturedImage source={{ uri: game.imageUri }} resizeMode="cover" />
+        <FeaturedContent>
+          <Title>{game.title}</Title>
+          <RecommendedBy>Recommended by your friend, Player</RecommendedBy>
+          <PriceContainer>
             {game.discountPercentage && (
-              <View
-                style={[styles.discountBadge, { backgroundColor: "#4c6b22" }]}
-              >
-                <Text style={styles.discountText}>
-                  -{game.discountPercentage}%
-                </Text>
-              </View>
+              <DiscountBadge>
+                <DiscountText>-{game.discountPercentage}%</DiscountText>
+              </DiscountBadge>
             )}
-            <View style={styles.pricesWrapper}>
+            <PricesWrapper>
               {game.discountedPrice !== undefined && (
                 <>
-                  <Text style={[styles.originalPrice, { color: colors.text }]}>
-                    ${game.originalPrice}
-                  </Text>
-                  <Text
-                    style={[styles.discountedPrice, { color: colors.text }]}
-                  >
-                    ${game.discountedPrice}
-                  </Text>
+                  <OriginalPrice>${game.originalPrice}</OriginalPrice>
+                  <DiscountedPrice>${game.discountedPrice}</DiscountedPrice>
                 </>
               )}
               {game.discountedPrice === undefined && (
-                <Text style={[styles.price, { color: colors.text }]}>
-                  ${game.originalPrice}
-                </Text>
+                <Price>${game.originalPrice}</Price>
               )}
-            </View>
-          </View>
+            </PricesWrapper>
+          </PriceContainer>
           {renderPlatformIcons()}
-        </View>
-      </TouchableOpacity>
+        </FeaturedContent>
+      </FeaturedCard>
     );
   }
 
   return (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.card }]}
-      activeOpacity={0.7}
-    >
-      <Image source={{ uri: game.imageUri }} style={styles.image} />
-      <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>{game.title}</Text>
+    <Card activeOpacity={0.7}>
+      <GameImage source={{ uri: game.imageUri }} resizeMode="cover" />
+      <Content>
+        <Title>{game.title}</Title>
         {renderPlatformIcons()}
-        <View style={styles.priceContainer}>
+        <PriceContainer>
           {game.discountPercentage && (
-            <View
-              style={[styles.discountBadge, { backgroundColor: "#4c6b22" }]}
-            >
-              <Text style={styles.discountText}>
-                -{game.discountPercentage}%
-              </Text>
-            </View>
+            <DiscountBadge>
+              <DiscountText>-{game.discountPercentage}%</DiscountText>
+            </DiscountBadge>
           )}
-          <View style={styles.pricesWrapper}>
+          <PricesWrapper>
             {game.discountedPrice !== undefined && (
               <>
-                <Text style={[styles.originalPrice, { color: colors.text }]}>
-                  ${game.originalPrice}
-                </Text>
-                <Text style={[styles.discountedPrice, { color: colors.text }]}>
-                  ${game.discountedPrice}
-                </Text>
+                <OriginalPrice>${game.originalPrice}</OriginalPrice>
+                <DiscountedPrice>${game.discountedPrice}</DiscountedPrice>
               </>
             )}
             {game.discountedPrice === undefined && (
-              <Text style={[styles.price, { color: colors.text }]}>
-                ${game.originalPrice}
-              </Text>
+              <Price>${game.originalPrice}</Price>
             )}
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
+          </PricesWrapper>
+        </PriceContainer>
+      </Content>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    marginVertical: 8,
-    borderRadius: 4,
-    overflow: "hidden",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-  },
-  image: {
-    width: 120,
-    height: 70,
-    resizeMode: "cover",
-  },
-  content: {
-    flex: 1,
-    padding: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  platformContainer: {
-    flexDirection: "row",
-    marginBottom: 4,
-  },
-  priceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-  },
-  discountBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 3,
-    marginRight: 8,
-  },
-  discountText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 12,
-  },
-  pricesWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  originalPrice: {
-    textDecorationLine: "line-through",
-    marginRight: 5,
-    fontSize: 12,
-  },
-  discountedPrice: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  price: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  featuredCard: {
-    marginVertical: 10,
-    borderRadius: 8,
-    overflow: "hidden",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-  },
-  featuredImage: {
-    width: "100%",
-    height: 180,
-    resizeMode: "cover",
-  },
-  featuredContent: {
-    padding: 12,
-  },
-  recommendedBy: {
-    fontSize: 14,
-    marginBottom: 8,
-    fontStyle: "italic",
-  },
-});

@@ -1,30 +1,35 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { Colors } from "../constants/Colors";
+import { ThemeProvider as StyledThemeProvider } from "styled-components/native";
+import { lightTheme, darkTheme, ThemeType } from "../theme";
 
-type ThemeType = "light" | "dark";
-
-interface ThemeContextProps {
-  theme: ThemeType;
-  colors: typeof Colors.dark | typeof Colors.light;
+type ThemeContextProps = {
+  theme: "light" | "dark";
+  colors: typeof lightTheme | typeof darkTheme;
   toggleTheme: () => void;
-}
+};
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<ThemeType>("dark"); // Default theme is dark to match Steam
+  const [themeMode, setThemeMode] = useState<"light" | "dark">("dark"); // Default theme is dark to match Steam
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    setThemeMode((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
-  const colors = theme === "light" ? Colors.light : Colors.dark;
+  const themeColors = themeMode === "light" ? lightTheme : darkTheme;
 
   return (
-    <ThemeContext.Provider value={{ theme, colors, toggleTheme }}>
-      {children}
+    <ThemeContext.Provider
+      value={{
+        theme: themeMode,
+        colors: themeColors,
+        toggleTheme,
+      }}
+    >
+      <StyledThemeProvider theme={themeColors}>{children}</StyledThemeProvider>
     </ThemeContext.Provider>
   );
 };

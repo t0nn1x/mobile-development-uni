@@ -1,22 +1,78 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  SafeAreaView,
-  ActivityIndicator,
-} from "react-native";
-import { useTheme } from "../contexts/ThemeContext";
+import styled from "styled-components/native";
+import { FlatList, ActivityIndicator } from "react-native";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { GameCard } from "../components/GameCard";
 import { gamesData, categories, Game } from "../data/gamesData";
 
+// Styled components
+const Container = styled.SafeAreaView`
+  flex: 1;
+  background-color: ${(props) => props.theme.background};
+`;
+
+const Header = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-horizontal: 16px;
+  padding-vertical: 12px;
+`;
+
+const LogoContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const Logo = styled.Image`
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  margin-right: 10px;
+`;
+
+const HeaderTitle = styled.Text`
+  font-size: 22px;
+  font-weight: bold;
+  color: ${(props) => props.theme.text};
+`;
+
+const SearchButton = styled.TouchableOpacity`
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const SearchIcon = styled.Text`
+  color: ${(props) => props.theme.tabBarInactive};
+`;
+
+const CategoriesContainer = styled.View`
+  padding-horizontal: 16px;
+  padding-vertical: 8px;
+`;
+
+const CategoryButton = styled.TouchableOpacity<{ isSelected: boolean }>`
+  padding-horizontal: 20px;
+  padding-vertical: 10px;
+  border-radius: 20px;
+  margin-right: 10px;
+  background-color: ${(props) =>
+    props.isSelected ? props.theme.primary : props.theme.card};
+`;
+
+const CategoryText = styled.Text<{ isSelected: boolean }>`
+  font-weight: bold;
+  color: ${(props) => (props.isSelected ? "white" : props.theme.text)};
+`;
+
+const LoaderContainer = styled.View`
+  padding: 20px;
+  align-items: center;
+`;
+
 export default function StoreScreen() {
-  const { colors } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState(categories[0].id);
   const [games, setGames] = useState<Game[]>(gamesData);
   const [loading, setLoading] = useState(false);
@@ -40,32 +96,27 @@ export default function StoreScreen() {
     if (!loading) return null;
 
     return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="small" color={colors.primary} />
-      </View>
+      <LoaderContainer>
+        <ActivityIndicator size="small" color="#66c0f4" />
+      </LoaderContainer>
     );
   };
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Image
+    <Container>
+      <Header>
+        <LogoContainer>
+          <Logo
             source={{
               uri: "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/steamworks_logo.png",
             }}
-            style={styles.logo}
           />
-          <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Store
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.searchButton}>
-          <Text style={{ color: colors.tabBarInactive }}>🔍</Text>
-        </TouchableOpacity>
-      </View>
+          <HeaderTitle>Store</HeaderTitle>
+        </LogoContainer>
+        <SearchButton>
+          <SearchIcon>🔍</SearchIcon>
+        </SearchButton>
+      </Header>
 
       <FlatList
         data={games}
@@ -74,95 +125,34 @@ export default function StoreScreen() {
           <GameCard game={item} featured={item.id === featuredGame?.id} />
         )}
         ListHeaderComponent={() => (
-          <View>
-            <FlatList
-              horizontal
-              data={categories}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[
-                    styles.categoryButton,
-                    selectedCategory === item.id
-                      ? { backgroundColor: colors.primary }
-                      : { backgroundColor: colors.card },
-                  ]}
-                  onPress={() => setSelectedCategory(item.id)}
-                >
-                  <Text
-                    style={[
-                      styles.categoryText,
-                      {
-                        color:
-                          selectedCategory === item.id ? "white" : colors.text,
-                      },
-                    ]}
-                  >
-                    {item.title}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoriesContainer}
-            />
-          </View>
+          <FlatList
+            horizontal
+            data={categories}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <CategoryButton
+                isSelected={selectedCategory === item.id}
+                onPress={() => setSelectedCategory(item.id)}
+              >
+                <CategoryText isSelected={selectedCategory === item.id}>
+                  {item.title}
+                </CategoryText>
+              </CategoryButton>
+            )}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+            }}
+          />
         )}
         ListFooterComponent={renderFooter}
         onEndReached={loadMoreGames}
         onEndReachedThreshold={0.5}
+        contentContainerStyle={{ paddingHorizontal: 16 }}
       />
 
       <ThemeToggle />
-    </SafeAreaView>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  logoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logo: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginRight: 10,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-  searchButton: {
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  categoriesContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  categoryButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  categoryText: {
-    fontWeight: "bold",
-  },
-  loaderContainer: {
-    padding: 20,
-    alignItems: "center",
-  },
-});

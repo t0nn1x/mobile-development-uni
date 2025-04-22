@@ -1,227 +1,204 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { useTheme } from "../contexts/ThemeContext";
+import styled from "styled-components/native";
 import { ChatItem as ChatItemType } from "../data/chatsData";
+
+// Styled components
+const Container = styled.TouchableOpacity`
+  flex-direction: row;
+  padding: 12px;
+  align-items: center;
+  background-color: ${(props) => props.theme.background};
+`;
+
+const AvatarContainer = styled.View`
+  position: relative;
+  margin-right: 12px;
+`;
+
+const Avatar = styled.Image`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+`;
+
+const AvatarOrange = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #e67e22;
+  justify-content: center;
+  align-items: center;
+`;
+
+const AvatarRed = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #e74c3c;
+  justify-content: center;
+  align-items: center;
+`;
+
+const AvatarDefault = styled.View`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #34495e;
+  justify-content: center;
+  align-items: center;
+`;
+
+const AvatarText = styled.Text`
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+`;
+
+const OnlineIndicator = styled.View`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #2ecc71;
+  border-width: 1px;
+  border-color: white;
+`;
+
+const OfflineIndicator = styled.View`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #3498db;
+  border-width: 1px;
+  border-color: white;
+`;
+
+const DiamondBadge = styled.Text`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 12px;
+`;
+
+const ContentContainer = styled.View`
+  flex: 1;
+`;
+
+const HeaderContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const Username = styled.Text`
+  font-weight: bold;
+  font-size: 16px;
+  color: ${(props) => props.theme.text};
+`;
+
+const MessageContainer = styled.View`
+  flex-direction: row;
+  margin-top: 2px;
+`;
+
+const YouText = styled.Text`
+  color: ${(props) => props.theme.tabBarInactive};
+`;
+
+const Message = styled.Text`
+  font-size: 14px;
+  flex: 1;
+  color: ${(props) => props.theme.tabBarInactive};
+`;
+
+const Date = styled.Text`
+  font-size: 14px;
+  margin-left: 4px;
+  color: ${(props) => props.theme.tabBarInactive};
+`;
+
+const UnreadBadge = styled.View`
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #3498db;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+`;
+
+const UnreadText = styled.Text`
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+`;
 
 interface ChatItemProps {
   chat: ChatItemType;
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chat }) => {
-  const { colors } = useTheme();
-
-  const getAvatarPlaceholder = () => {
-    if (chat.userName === "Player123") {
-      return (
-        <View
-          style={[styles.avatarPlaceholder, { backgroundColor: "#e74c3c" }]}
-        >
-          <Text style={styles.avatarPlaceholderText}>⚠️</Text>
-        </View>
-      );
-    }
-    return (
-      <View style={[styles.avatarPlaceholder, { backgroundColor: "#34495e" }]}>
-        <Text style={styles.avatarPlaceholderText}>?</Text>
-      </View>
-    );
-  };
-
   const renderAvatar = () => {
     if (chat.avatarUri && chat.userName === "Σxprεssσ #=_-#") {
       return (
-        <View style={styles.avatarContainer}>
-          <Image source={{ uri: chat.avatarUri }} style={styles.avatar} />
-          <Text style={styles.diamondBadge}>💎</Text>
-        </View>
+        <AvatarContainer>
+          <Avatar source={{ uri: chat.avatarUri }} />
+          <DiamondBadge>💎</DiamondBadge>
+        </AvatarContainer>
       );
     } else if (chat.avatarUri && chat.userName === "Mark Dyson") {
       return (
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatarOrange}>
-            <Text style={styles.avatarText}>😎</Text>
-          </View>
-          {chat.isOnline && <View style={styles.onlineIndicator} />}
-        </View>
+        <AvatarContainer>
+          <AvatarOrange>
+            <AvatarText>😎</AvatarText>
+          </AvatarOrange>
+          {chat.isOnline && <OnlineIndicator />}
+        </AvatarContainer>
       );
     } else if (chat.userName === "Player123") {
       return (
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatarRed}>
-            <Text style={styles.avatarText}>⚠️</Text>
-          </View>
-          {chat.isOnline && <View style={styles.onlineIndicator} />}
-          {!chat.isOnline && <View style={styles.offlineIndicator} />}
-        </View>
+        <AvatarContainer>
+          <AvatarRed>
+            <AvatarText>⚠️</AvatarText>
+          </AvatarRed>
+          {chat.isOnline && <OnlineIndicator />}
+          {!chat.isOnline && <OfflineIndicator />}
+        </AvatarContainer>
       );
     } else {
       return (
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatarDefault}>
-            <Text style={styles.avatarText}>?</Text>
-          </View>
-        </View>
+        <AvatarContainer>
+          <AvatarDefault>
+            <AvatarText>?</AvatarText>
+          </AvatarDefault>
+        </AvatarContainer>
       );
     }
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.container, { backgroundColor: colors.background }]}
-      activeOpacity={0.7}
-    >
+    <Container activeOpacity={0.7}>
       {renderAvatar()}
-      <View style={styles.contentContainer}>
-        <View style={styles.headerContainer}>
-          <Text style={[styles.username, { color: colors.text }]}>
-            {chat.userName}
-          </Text>
-        </View>
-        <View style={styles.messageContainer}>
-          {chat.isUser && (
-            <Text style={{ color: colors.tabBarInactive }}>You: </Text>
-          )}
-          <Text
-            style={[styles.message, { color: colors.tabBarInactive }]}
-            numberOfLines={1}
-          >
-            {chat.lastMessage}
-          </Text>
-          <Text style={[styles.date, { color: colors.tabBarInactive }]}>
-            {" "}
-            • {chat.date}
-          </Text>
-        </View>
-      </View>
+      <ContentContainer>
+        <HeaderContainer>
+          <Username>{chat.userName}</Username>
+        </HeaderContainer>
+        <MessageContainer>
+          {chat.isUser && <YouText>You: </YouText>}
+          <Message numberOfLines={1}>{chat.lastMessage}</Message>
+          <Date> • {chat.date}</Date>
+        </MessageContainer>
+      </ContentContainer>
       {chat.unreadCount && (
-        <View style={styles.unreadBadge}>
-          <Text style={styles.unreadText}>{chat.unreadCount}</Text>
-        </View>
+        <UnreadBadge>
+          <UnreadText>{chat.unreadCount}</UnreadText>
+        </UnreadBadge>
       )}
-    </TouchableOpacity>
+    </Container>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    padding: 12,
-    alignItems: "center",
-  },
-  avatarContainer: {
-    position: "relative",
-    marginRight: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  avatarOrange: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#e67e22",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarRed: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#e74c3c",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarDefault: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#34495e",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  onlineIndicator: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#2ecc71",
-    borderWidth: 1,
-    borderColor: "white",
-  },
-  offlineIndicator: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#3498db",
-    borderWidth: 1,
-    borderColor: "white",
-  },
-  diamondBadge: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    fontSize: 12,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  headerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  username: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  messageContainer: {
-    flexDirection: "row",
-    marginTop: 2,
-  },
-  message: {
-    fontSize: 14,
-    flex: 1,
-  },
-  date: {
-    fontSize: 14,
-    marginLeft: 4,
-  },
-  unreadBadge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#3498db",
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 8,
-  },
-  unreadText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  avatarPlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarPlaceholderText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});
