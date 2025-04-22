@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import {
   Appbar,
   Text,
@@ -36,6 +38,7 @@ const FileViewScreen: React.FC<FileViewScreenProps> = ({
   route,
   navigation,
 }) => {
+  const insets = useSafeAreaInsets();
   const { uri, name } = route.params;
 
   const {
@@ -126,12 +129,20 @@ const FileViewScreen: React.FC<FileViewScreenProps> = ({
         </ScrollView>
       )}
 
-      <FAB
-        style={styles.fab}
-        icon="pencil"
-        onPress={handleEdit}
-        disabled={loading || !!error}
-      />
+      <Portal>
+        <FAB
+          icon="pencil"
+          onPress={handleEdit}
+          disabled={loading || !!error}
+          style={[
+            styles.fab,
+            {
+              bottom: insets.bottom + 16,
+              right: 16,
+            },
+          ]}
+        />
+      </Portal>
 
       <Portal>
         <Dialog
@@ -186,7 +197,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: "absolute",
-    margin: 16,
+    margin: 16, 
     right: 0,
     bottom: 0,
   },

@@ -8,6 +8,7 @@ import {
   Button,
   Text,
 } from "react-native-paper";
+import { useIsFocused } from "@react-navigation/native";
 import { createSafeFilename } from "../utils/fileUtils";
 
 interface FileActionsProps {
@@ -21,6 +22,8 @@ const FileActions: React.FC<FileActionsProps> = ({
   onCreateFile,
   loading,
 }) => {
+  const isFocused = useIsFocused();
+
   const [fabOpen, setFabOpen] = useState(false);
   const [showDirDialog, setShowDirDialog] = useState(false);
   const [showFileDialog, setShowFileDialog] = useState(false);
@@ -28,6 +31,8 @@ const FileActions: React.FC<FileActionsProps> = ({
   const [fileName, setFileName] = useState("");
   const [fileContent, setFileContent] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  if (!isFocused) return null;
 
   const onFabStateChange = ({ open }: { open: boolean }) => setFabOpen(open);
 
